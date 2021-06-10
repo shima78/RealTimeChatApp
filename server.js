@@ -46,6 +46,13 @@ io.on('connection',socket =>{
         io.to(user.room).emit('message',formatMessage(user.username,msg));
     })
 
+    //listen for answers
+    socket.on('chatAnswer',ans => {
+        const user = getCurrentUser(socket.id)
+        //show this naswer to everone
+        io.to(user.room).emit('answer',formatMessage(user.username,ans));
+    })
+
     socket.on('disconnect', () =>{
         const user = userLeave(socket.id);
         console.log(user)

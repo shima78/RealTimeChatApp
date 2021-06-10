@@ -1,6 +1,11 @@
 const chatForm = document.getElementById('chat-form');
+const anwersForm = document.getElementById('chat-form-answers');
+
 const socket = io();
+
 const chatMessages = document.querySelector('.chat-messages');
+const chatAnswers = document.querySelector('.chat-answers')
+
 const roomName = document.getElementById('room-name');
 const userList = document.getElementById('users');
 
@@ -32,6 +37,22 @@ socket.on('message', message => {
     document.getElementById('msg').focus();
 });
 
+
+//recieve a message from server
+socket.on('answer', answer => {
+    // console.log(message);
+    outputAnswer(answer);
+
+    //scrol down on new message
+    chatAnswers.scrollTop = chatAnswers.scrollHeight;
+    document.getElementById('ans').value = '';
+    document.getElementById('ans').focus();
+});
+
+
+
+
+
 //message submit
 chatForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -40,6 +61,15 @@ chatForm.addEventListener('submit', (e) => {
     //emit a message to server
     socket.emit('chatMessage', msg);
 })
+
+anwersForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    //get message text
+    const ans = document.getElementById('ans').value;
+    //emit a message to server
+    socket.emit('chatAnswer', ans);
+})
+
 
 //output message to DOM
 function outputMessage(message) {
@@ -50,6 +80,18 @@ function outputMessage(message) {
         ${message.text}
     </p>`;
     document.querySelector('.chat-messages').appendChild(div);
+}
+
+
+//output Answer to DOM
+function outputAnswer(answer) {
+    const div = document.createElement('div');
+    div.classList.add('answer');
+    div.innerHTML = 	`<p class="meta">${answer.username}<span> ${answer.time}</span></p>
+    <p class="text">
+        ${answer.text}
+    </p>`;
+    document.querySelector('.chat-answers').appendChild(div);
 }
 
 //add room name to DOM
